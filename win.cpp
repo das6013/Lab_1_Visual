@@ -1,79 +1,34 @@
 #include "win.h"
-
-#include "win.h"
+#include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QMessageBox>
 
-Win::Win(QWidget *parent)
-    : QWidget{parent}
+Win::Win(QWidget *parent):QWidget(parent)
 {
-    setWindowTitle("Power of 2"); // задаем заголовок окна
-    frame = new QFrame(this); // создаем рамку
-    frame->setFrameShadow(QFrame::Raised); //устанавдиваем тень
-    frame->setFrameShape(QFrame::Panel); //вид
-    inputLabel = new QLabel("Enter Number:", this); //метка
-    inputEdit = new QLineEdit("",this); //строчный редактор ввода
-    StrValidator *v=new StrValidator(inputEdit); //валидатор
-    inputEdit->setValidator(v); //устанавливаем валидатор на ввод
-    outputLabel = new QLabel("Answer:", this); //метка
-    outputEdit = new QLineEdit("",this); // строчный редактор вывода
-    nextButton = new QPushButton("Next digital", this); //кнопки
-    exitButton = new QPushButton("Exit app", this);
-    QVBoxLayout *vLayout1 = new QVBoxLayout(frame); //рзаметки
-    vLayout1->addWidget(inputLabel);
-    vLayout1->addWidget(inputEdit);
-    vLayout1->addWidget(outputLabel);
-    vLayout1->addWidget(outputEdit);
-    vLayout1->addStretch();
-    QVBoxLayout *vLayout2 = new QVBoxLayout();
-    vLayout2->addWidget(nextButton);
-    vLayout2->addWidget(exitButton);
-    vLayout2->addStretch();
-    QHBoxLayout *hLayout = new QHBoxLayout(this);
-    hLayout->addWidget(frame);
-    hLayout->addLayout(vLayout2);
-    begin();
-    connect(exitButton,SIGNAL(clicked(bool)), //когда нажата кнопка вызода закрываем окно
+    this->setWindowTitle("Counter"); //устанавливаем заголовок окна
+    label1 = new QLabel("Add 1",this); //создаем метки
+    label2 = new QLabel("Add 5",this);
+    edit1 = new Counter("0",this); //создаем поля редактирования
+    edit2 = new Counter("0",this);
+    calcbutton=new QPushButton("+1",this); //создаем кнопки
+    exitbutton=new QPushButton("Exit",this);
+    QHBoxLayout *layout1 = new QHBoxLayout(); //создаем разметку
+    layout1->addWidget(label1);//добавляем на разметку метки
+    layout1->addWidget(label2);
+    QHBoxLayout *layout2 = new QHBoxLayout();
+    layout2->addWidget(edit1);
+    layout2->addWidget(edit2);
+    QHBoxLayout *layout3 = new QHBoxLayout();
+    layout3->addWidget(calcbutton);
+    layout3->addWidget(exitbutton);
+    QVBoxLayout *layout4 = new QVBoxLayout(this);
+    layout4->addLayout(layout1);
+    layout4->addLayout(layout2);
+    layout4->addLayout(layout3);
+    // связь сигнала нажатия кнопки и слота закрытия окна
+    connect(calcbutton,SIGNAL(clicked(bool)),
+        edit1,SLOT(add_one()));
+    connect(edit1,SIGNAL(tick_signal()),
+        edit2,SLOT(add_one()));
+    connect(exitbutton,SIGNAL(clicked(bool)),
         this,SLOT(close()));
-    connect(nextButton,SIGNAL(clicked(bool)), // когда нажата кнопка возведения в квадрат
-        this,SLOT(begin()));
-    connect(inputEdit,SIGNAL(returnPressed()), // когда изменен инпут
-        this,SLOT(calc()));
-}
-
-void Win::begin()
-{
-    inputEdit->clear(); //при начале очищаем ввод
-    nextButton->setEnabled(false);//отключаем кнопку
-    nextButton->setDefault(false);
-    inputEdit->setEnabled(true);//включаем ввод
-    outputLabel->setVisible(false);//скрываем вывод
-    outputEdit->setVisible(false);
-    outputEdit->setEnabled(false);
-    inputEdit->setFocus();//устанавлен фокус на ввод
-}
-void Win::calc()
-{
-    bool Ok=true; float r,a;
-    QString str=inputEdit->text();//получаем строку
-    a=str.toDouble(&Ok);// преобразуем в double
-    if (Ok)
-    {
-        r=a*a;//возводим в квадрат
-        str.setNum(r); //устанавливаем в строку
-        outputEdit->setText(str); //устанавливаем в текст
-        inputEdit->setEnabled(false);//отключаем кнопку
-        outputLabel->setVisible(true);//включаем кнопки и вывод
-        outputEdit->setVisible(true);
-        nextButton->setDefault(true);
-        nextButton->setEnabled(true);
-        nextButton->setFocus();
-    }
-    else
-        if (!str.isEmpty())
-        {
-            QMessageBox msgBox(QMessageBox::Information, ("Возведение в квадрат."), ("Введено неверное значение."),
-                       QMessageBox::Ok);
-            msgBox.exec();
-        }
 }
