@@ -8,8 +8,8 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv); //псоздание объекта приложения
-    Win win(0); //схдание объекта управления окном
+    QApplication app(argc, argv); //создание объекта приложения
+    Win win; //схдание объекта управления окном
     win.show(); //визуализация окна
     return app.exec(); //запуск цикла обработки прилжения
 }
