@@ -9,32 +9,36 @@
 #include <QPushButton>
 #include <QValidator>
 
-class Win : public QWidget // класс окна
+class Counter:public QLineEdit //класс счетчик
 {
-    Q_OBJECT // макрос Qt, обеспечивающий корректное создание сигналов и слотов
-private:
-    QFrame *frame; // рамка
-    QLabel *inputLabel; // метка ввода
-    QLineEdit *inputEdit; // строчный редактор ввода
-    QLabel *outputLabel; // метка вывода
-    QLineEdit *outputEdit; // строчный редактор вывода
-    QPushButton *nextButton; // кнопка Следующее
-    QPushButton *exitButton; // кнопка Выход
+    Q_OBJECT
 public:
-    explicit Win(QWidget *parent = nullptr); //конструктор
-
+    Counter(const QString & contents, QWidget *parent=0):
+        QLineEdit(contents,parent){} //constructor
+signals:
+    void tick_signal();
 public slots:
-    void begin(); //метод начальной настройки интерфейса
-    void calc(); //метод реализации интерфйса
+    void add_one()
+    {
+        QString str=text();
+        int dig=str.toInt(); //convet to int
+        if (dig!=0 && dig%5 ==0) emit tick_signal();
+        dig++; //увеличиваем на 1
+        str.setNum(dig); //update str
+        setText(str); //set new str
+    }
 };
 
-class StrValidator:public QValidator { //класс компонента проверки ввода
+class Win: public QWidget
+{
+    Q_OBJECT
+protected:
+    QLabel *label1,*label2; //метки
+    Counter *edit1,*edit2; //чсетчики
+    QPushButton *calcbutton; //кнопка увеличения
+    QPushButton *exitbutton; //кнопка вызода
 public:
-    StrValidator(QObject *parent):QValidator(parent) {}
-    virtual State validate(QString &str, int &pos) const
-    {
-        return Acceptable; //метод всегда принимает вводимую строку
-    }
+    Win(QWidget *parent = 0); //конструктор
 };
 
 #endif // WIN_H
